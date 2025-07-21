@@ -1,0 +1,14 @@
+feature_index,feature_name,description
+0,age,Tuổi (năm)
+1,sex,"Giới tính (1 = nam, 0 = nữ)"
+2,cp,"Loại đau ngực (0=điển hình, 1=không điển hình, 2=không liên quan, 3=không triệu chứng)"
+3,trestbps,Huyết áp lúc nghỉ (mm Hg)
+4,chol,Cholesterol huyết thanh (mg/dl)
+5,fbs,"Đường huyết lúc đói > 120 mg/dl (1 = đúng, 0 = sai)"
+6,restecg,"Kết quả điện tâm đồ lúc nghỉ (0=bình thường, 1=bất thường sóng ST-T, 2=phì đại tâm thất trái)"
+7,thalach,Nhịp tim tối đa đạt được
+8,exang,"Đau thắt ngực do tập thể dục (1 = có, 0 = không)"
+9,oldpeak,Sự chênh lệch đoạn ST do tập thể dục
+10,slope,"Độ dốc của đoạn ST tập thể dục (0=dốc lên, 1=phẳng, 2=dốc xuống)"
+11,ca,Số lượng mạch máu chính (0-3)
+12,thal,"Thalassemia (1=khiếm khuyết cố định, 2=bình thường, 3=khiếm khuyết có thể đảo ngược)"

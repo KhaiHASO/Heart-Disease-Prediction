@@ -1,0 +1,1298 @@
+<!DOCTYPE html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Heart Disease Prediction AI - Chẩn đoán bệnh tim thông minh</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+      @import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&family=Orbitron:wght@400;700;900&display=swap");
+
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: "Inter", sans-serif;
+        background: radial-gradient(
+          ellipse at center,
+          #0a0a2e 0%,
+          #16213e 25%,
+          #0f3460 50%,
+          #533a7d 75%,
+          #6a4c93 100%
+        );
+        min-height: 100vh;
+        color: #e2e8f0;
+        overflow-x: hidden;
+      }
+
+      /* Custom Tailwind Colors & Variables */
+      :root {
+        --background: oklch(1 0 0);
+        --foreground: oklch(0.145 0 0);
+        --card: oklch(1 0 0);
+        --card-foreground: oklch(0.145 0 0);
+        --popover: oklch(1 0 0);
+        --popover-foreground: oklch(0.145 0 0);
+        --primary: oklch(0.205 0 0);
+        --primary-foreground: oklch(0.985 0 0);
+        --secondary: oklch(0.97 0 0);
+        --secondary-foreground: oklch(0.205 0 0);
+        --muted: oklch(0.97 0 0);
+        --muted-foreground: oklch(0.556 0 0);
+        --accent: oklch(0.97 0 0);
+        --accent-foreground: oklch(0.205 0 0);
+        --destructive: oklch(0.577 0.245 27.325);
+        --destructive-foreground: oklch(0.577 0.245 27.325);
+        --border: oklch(0.922 0 0);
+        --input: oklch(0.922 0 0);
+        --ring: oklch(0.708 0 0);
+        --chart-1: oklch(0.646 0.222 41.116);
+        --chart-2: oklch(0.6 0.118 184.704);
+        --chart-3: oklch(0.398 0.07 227.392);
+        --chart-4: oklch(0.828 0.189 84.429);
+        --chart-5: oklch(0.769 0.188 70.08);
+        --radius: 0.625rem;
+        --sidebar: oklch(0.985 0 0);
+        --sidebar-foreground: oklch(0.145 0 0);
+        --sidebar-primary: oklch(0.205 0 0);
+        --sidebar-primary-foreground: oklch(0.985 0 0);
+        --sidebar-accent: oklch(0.97 0 0);
+        --sidebar-accent-foreground: oklch(0.205 0 0);
+        --sidebar-border: oklch(0.922 0 0);
+        --sidebar-ring: oklch(0.708 0 0);
+      }
+
+      .dark {
+        --background: oklch(0.145 0 0);
+        --foreground: oklch(0.985 0 0);
+        --card: oklch(0.145 0 0);
+        --card-foreground: oklch(0.985 0 0);
+        --popover: oklch(0.145 0 0);
+        --popover-foreground: oklch(0.985 0 0);
+        --primary: oklch(0.985 0 0);
+        --primary-foreground: oklch(0.205 0 0);
+        --secondary: oklch(0.269 0 0);
+        --secondary-foreground: oklch(0.985 0 0);
+        --muted: oklch(0.269 0 0);
+        --muted-foreground: oklch(0.708 0 0);
+        --accent: oklch(0.269 0 0);
+        --accent-foreground: oklch(0.985 0 0);
+        --destructive: oklch(0.396 0.141 25.723);
+        --destructive-foreground: oklch(0.637 0.237 25.331);
+        --border: oklch(0.269 0 0);
+        --input: oklch(0.269 0 0);
+        --ring: oklch(0.439 0 0);
+        --chart-1: oklch(0.488 0.243 264.376);
+        --chart-2: oklch(0.696 0.17 162.48);
+        --chart-3: oklch(0.769 0.188 70.08);
+        --chart-4: oklch(0.627 0.265 303.9);
+        --chart-5: oklch(0.645 0.246 16.439);
+        --sidebar: oklch(0.205 0 0);
+        --sidebar-foreground: oklch(0.985 0 0);
+        --sidebar-primary: oklch(0.488 0.243 264.376);
+        --sidebar-primary-foreground: oklch(0.985 0 0);
+        --sidebar-accent: oklch(0.269 0 0);
+        --sidebar-accent-foreground: oklch(0.985 0 0);
+        --sidebar-border: oklch(0.269 0 0);
+        --sidebar-ring: oklch(0.439 0 0);
+      }
+
+      .bg-grid-pattern {
+        background-image: linear-gradient(rgba(6, 182, 212, 0.1) 1px, transparent 1px),
+          linear-gradient(90deg, rgba(6, 182, 212, 0.1) 1px, transparent 1px);
+        background-size: 50px 50px;
+      }
+
+      /* Particle System */
+      .particle-system {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+        z-index: 0; /* Changed to 0 to be behind content */
+      }
+
+      .particle {
+        position: absolute;
+        width: 4px; /* Increased size slightly */
+        height: 4px;
+        background: rgba(0, 212, 255, 0.6);
+        border-radius: 50%;
+        animation: float-particle 20s linear infinite, pulse 2s ease-in-out infinite alternate;
+      }
+
+      @keyframes float-particle {
+        0% {
+          transform: translateY(100vh) translateX(0) scale(0);
+          opacity: 0;
+        }
+        10% {
+          opacity: 0.6;
+          transform: scale(1);
+        }
+        90% {
+          opacity: 0.6;
+        }
+        100% {
+          transform: translateY(-100px) translateX(50px) scale(0);
+          opacity: 0;
+        }
+      }
+
+      @keyframes pulse {
+        0% {
+          transform: scale(1);
+        }
+        100% {
+          transform: scale(1.2);
+        }
+      }
+
+      .container {
+        max-width: 1600px;
+        margin: 0 auto;
+        padding: 15px;
+        position: relative;
+        z-index: 10;
+      }
+
+      /* Compact Header */
+      .header {
+        text-align: center;
+        margin-bottom: 20px;
+        padding: 20px 0;
+        background: rgba(15, 23, 42, 0.4);
+        backdrop-filter: blur(10px);
+        border-radius: 20px;
+        border: 1px solid rgba(0, 212, 255, 0.3);
+        flex-shrink: 0;
+      }
+
+      .logo {
+        display: inline-flex;
+        align-items: center;
+        gap: 15px;
+        margin-bottom: 15px;
+      }
+
+      .logo-icon {
+        width: 50px;
+        height: 50px;
+        background: linear-gradient(135deg, #00d4ff, #ff6b9d);
+        border-radius: 15px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 8px 25px rgba(0, 212, 255, 0.3);
+      }
+
+      .main-title {
+        font-family: "Orbitron", monospace;
+        font-size: 2.5rem;
+        font-weight: 900;
+        background: linear-gradient(135deg, #ffffff, #00d4ff, #ffffff, #ff6b9d);
+        background-size: 200% 200%;
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        margin-bottom: 8px;
+        text-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
+      }
+
+      .subtitle {
+        font-size: 1rem;
+        color: #ffffff;
+        font-weight: 500;
+        text-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+      }
+
+      /* Compact Main Content */
+      .main-content {
+        display: grid;
+        grid-template-columns: 1fr 420px;
+        gap: 20px;
+        align-items: stretch;
+      }
+
+      .heart-section {
+        background: rgba(15, 23, 42, 0.4);
+        backdrop-filter: blur(10px);
+        border-radius: 20px;
+        border: 1px solid rgba(0, 212, 255, 0.3);
+        padding: 20px;
+        position: relative;
+      }
+
+      .heart-container {
+        width: 100%;
+        height: 100%;
+        position: relative;
+        border-radius: 15px;
+        overflow: hidden;
+        border: 1px solid rgba(0, 212, 255, 0.2);
+      }
+
+      /* Compact Form */
+      .form-section {
+        background: rgba(15, 23, 42, 0.4);
+        backdrop-filter: blur(10px);
+        border-radius: 20px;
+        border: 1px solid rgba(0, 212, 255, 0.3);
+        padding: 20px;
+        display: flex;
+        flex-direction: column;
+      }
+
+      .form-title {
+        font-family: "Orbitron", monospace;
+        font-size: 1.4rem;
+        font-weight: 700;
+        background: linear-gradient(135deg, #00d4ff, #c471ed);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        margin-bottom: 15px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        flex-shrink: 0;
+      }
+
+      .form-content {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+      }
+
+      .form-group {
+        margin-bottom: 12px;
+      }
+
+      .form-label {
+        display: block;
+        font-size: 0.85rem;
+        font-weight: 600;
+        color: #cbd5e1;
+        margin-bottom: 6px;
+      }
+
+      .form-input,
+      .form-select {
+        width: 100%;
+        padding: 10px 15px;
+        background: rgba(30, 41, 59, 0.6);
+        border: 1px solid rgba(71, 85, 105, 0.5);
+        border-radius: 12px;
+        color: #e2e8f0;
+        font-size: 0.9rem;
+        transition: border-color 0.3s ease;
+        height: 40px; /* Fixed height */
+      }
+
+      .form-input:focus,
+      .form-select:focus {
+        outline: none;
+        border-color: #00d4ff;
+      }
+
+      /* Compact Button */
+      .analyze-btn {
+        width: 100%;
+        padding: 15px;
+        background: linear-gradient(135deg, #00d4ff, #ff6b9d);
+        border: none;
+        border-radius: 12px;
+        color: white;
+        font-size: 1rem;
+        font-weight: 700;
+        font-family: "Orbitron", monospace;
+        cursor: pointer;
+        transition: transform 0.3s ease;
+        margin-top: 15px;
+        flex-shrink: 0;
+      }
+
+      .analyze-btn:hover {
+        transform: translateY(-2px);
+      }
+
+      .analyze-btn:disabled {
+        opacity: 0.7;
+        cursor: not-allowed;
+        transform: none;
+      }
+
+      /* Compact Loading */
+      .loading-spinner {
+        display: none;
+        width: 20px;
+        height: 20px;
+        border: 2px solid rgba(255, 255, 255, 0.3);
+        border-top: 2px solid white;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+        margin-right: 10px;
+      }
+
+      @keyframes spin {
+        0% {
+          transform: rotate(0deg);
+        }
+        100% {
+          transform: rotate(360deg);
+        }
+      }
+
+      /* Results - Hidden by default */
+      .result-section {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(10, 10, 46, 0.95);
+        backdrop-filter: blur(10px);
+        z-index: 1000;
+        display: none;
+        overflow-y: auto;
+        padding: 10px;
+      }
+
+      .result-content-wrapper {
+        max-width: 1400px;
+        width: 95%;
+        margin: 0 auto;
+        background: rgba(15, 23, 42, 0.8);
+        border-radius: 25px;
+        border: 1px solid rgba(0, 212, 255, 0.3);
+        padding: 60px;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+        height: auto;
+        min-height: fit-content;
+      }
+
+      .result-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 25px;
+      }
+
+      .result-header-left {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+      }
+
+      .result-icon {
+        width: 60px;
+        height: 60px;
+        border-radius: 15px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: linear-gradient(135deg, #10b981, #059669);
+      }
+
+      .result-title {
+        font-family: "Orbitron", monospace;
+        font-size: 1.8rem;
+        font-weight: 700;
+        background: linear-gradient(135deg, #10b981, #00d4ff);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+      }
+
+      .close-btn {
+        background: rgba(239, 68, 68, 0.2);
+        border: 1px solid #ef4444;
+        color: #ef4444;
+        padding: 8px 15px;
+        border-radius: 10px;
+        cursor: pointer;
+        font-size: 0.9rem;
+        font-weight: 600;
+        transition: background-color 0.3s ease;
+      }
+
+      .close-btn:hover {
+        background: rgba(239, 68, 68, 0.3);
+      }
+
+
+
+
+
+      /* Form 2 columns layout */
+      .form-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 15px;
+        flex: 1;
+      }
+
+      .form-grid .form-group {
+        margin-bottom: 0; /* Remove margin-bottom from form-group */
+      }
+
+      /* Full width for button */
+      .form-full-width {
+        grid-column: 1 / -1;
+      }
+
+      /* Responsive for all laptop screens */
+      
+      /* Large Laptops (15-17 inch) */
+      @media (min-width: 1440px) {
+        .container {
+          max-width: 1800px;
+          padding: 20px;
+        }
+        
+        .main-content {
+          grid-template-columns: 1fr 480px;
+          gap: 30px;
+        }
+        
+        .main-title {
+          font-size: 3rem;
+        }
+        
+        .form-title {
+          font-size: 1.6rem;
+        }
+        
+        .result-content-wrapper {
+          max-width: 1600px;
+          width: 90%;
+          padding: 70px;
+        }
+        
+        .result-section {
+          padding: 15px;
+        }
+      }
+      
+      /* Medium Laptops (13-15 inch) */
+      @media (min-width: 1200px) and (max-width: 1439px) {
+        .container {
+          max-width: 1400px;
+          padding: 18px;
+        }
+        
+        .main-content {
+          grid-template-columns: 1fr 450px;
+          gap: 25px;
+        }
+        
+        .main-title {
+          font-size: 2.8rem;
+        }
+        
+        .result-content-wrapper {
+          max-width: 1400px;
+          width: 92%;
+          padding: 60px;
+        }
+        
+        .result-section {
+          padding: 12px;
+        }
+      }
+      
+      /* Small Laptops (11-13 inch) */
+      @media (min-width: 1024px) and (max-width: 1199px) {
+        .container {
+          max-width: 1200px;
+          padding: 15px;
+        }
+        
+        .main-content {
+          grid-template-columns: 1fr 420px;
+          gap: 20px;
+        }
+        
+        .main-title {
+          font-size: 2.5rem;
+        }
+        
+        .result-content-wrapper {
+          max-width: 1200px;
+          width: 94%;
+          padding: 50px;
+        }
+        
+        .result-section {
+          padding: 10px;
+        }
+      }
+      
+      /* Tablet Landscape */
+      @media (min-width: 768px) and (max-width: 1023px) {
+        .container {
+          max-width: 1000px;
+          padding: 15px;
+        }
+        
+        .main-content {
+          grid-template-columns: 1fr;
+          gap: 20px;
+        }
+        
+
+        
+        .form-grid {
+          grid-template-columns: 1fr 1fr;
+          gap: 15px;
+        }
+        
+        .result-content-wrapper {
+          max-width: 1000px;
+          width: 96%;
+          padding: 40px;
+        }
+        
+        .result-section {
+          padding: 8px;
+        }
+      }
+      
+      /* Tablet Portrait */
+      @media (min-width: 640px) and (max-width: 767px) {
+        .container {
+          max-width: 800px;
+          padding: 12px;
+        }
+        
+        .main-content {
+          grid-template-columns: 1fr;
+          gap: 15px;
+        }
+        
+
+        
+        .form-grid {
+          grid-template-columns: 1fr 1fr;
+          gap: 12px;
+        }
+        
+        .main-title {
+          font-size: 2.2rem;
+        }
+        
+        .result-content-wrapper {
+          max-width: 800px;
+          width: 97%;
+          padding: 35px;
+        }
+        
+        .result-section {
+          padding: 5px;
+        }
+      }
+
+      /* Mobile Devices */
+      @media (max-width: 639px) {
+        .container {
+          max-width: 100%;
+          padding: 10px;
+        }
+        
+        .main-content {
+          grid-template-columns: 1fr;
+          gap: 15px;
+        }
+        
+        .form-grid {
+          grid-template-columns: 1fr;
+          gap: 10px;
+        }
+
+        .main-title {
+          font-size: 2rem;
+        }
+        .subtitle {
+          font-size: 0.9rem;
+        }
+
+        .header {
+          padding: 15px 0;
+          margin-bottom: 15px;
+        }
+
+        .form-title {
+          font-size: 1.2rem;
+        }
+        .form-label {
+          font-size: 0.8rem;
+        }
+        .form-input,
+        .form-select {
+          font-size: 0.85rem;
+        }
+        .analyze-btn {
+          font-size: 0.9rem;
+          padding: 12px;
+        }
+
+        .result-content-wrapper {
+          max-width: 100%;
+          width: 98%;
+          padding: 25px;
+        }
+        
+        .result-section {
+          padding: 3px;
+        }
+        .result-header-left {
+          gap: 10px;
+        }
+        .result-icon {
+          width: 50px;
+          height: 50px;
+        }
+        .result-title {
+          font-size: 1.5rem;
+        }
+        .close-btn {
+          font-size: 0.8rem;
+          padding: 6px 12px;
+        }
+        .risk-level {
+          font-size: 1.5rem;
+          padding: 6px 12px;
+        }
+      }
+
+      /* Extra Small Mobile */
+      @media (max-width: 480px) {
+        .main-title {
+          font-size: 1.8rem;
+        }
+        .logo-icon {
+          width: 40px;
+          height: 40px;
+        }
+        .result-title {
+          font-size: 1.2rem;
+        }
+        .result-icon {
+          width: 40px;
+          height: 40px;
+        }
+        .risk-level {
+          font-size: 1.2rem;
+        }
+        
+        .patient-info-display {
+          grid-template-columns: 1fr;
+          gap: 10px;
+        }
+        
+        .result-content-wrapper {
+          max-width: 100%;
+          width: 99%;
+          padding: 20px;
+        }
+        
+        .result-section {
+          padding: 2px;
+        }
+      }
+      
+      /* Ultra Small Mobile */
+      @media (max-width: 360px) {
+        .main-title {
+          font-size: 1.5rem;
+        }
+        .subtitle {
+          font-size: 0.8rem;
+        }
+        .form-title {
+          font-size: 1rem;
+        }
+        .result-content-wrapper {
+          max-width: 100%;
+          width: 99.5%;
+          padding: 15px;
+        }
+        
+        .result-section {
+          padding: 1px;
+        }
+      }
+
+      /* Simple Animations */
+      .fade-in-up {
+        animation: fadeInUp 0.6s ease-out forwards;
+      }
+
+      @keyframes fadeInUp {
+        0% {
+          opacity: 0;
+          transform: translateY(15px);
+        }
+        100% {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Simplified Grid -->
+    <div class="bg-grid-pattern fixed inset-0 opacity-10 pointer-events-none z-0"></div>
+
+    <!-- Minimal Particle System -->
+    <div class="particle-system" id="particle-system"></div>
+
+    <div class="container">
+      <!-- Compact Header -->
+      <div class="header fade-in-up">
+        <div class="logo">
+          <div class="logo-icon">
+            <svg width="25" height="25" fill="white" viewBox="0 0 24 24">
+              <path
+                d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"
+              />
+            </svg>
+          </div>
+          <div>
+            <h1 class="main-title">Heart Disease Prediction AI</h1>
+            <p class="subtitle">Hệ thống chẩn đoán bệnh tim thông minh với AI</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Compact Main Content -->
+      <div class="main-content">
+        <!-- Compact Heart Visualization -->
+        <div class="heart-section fade-in-up">
+          <div class="heart-container" id="heart-container">
+            <video 
+              autoplay 
+              muted 
+              loop 
+              playsinline
+              preload="auto"
+              class="w-full h-full object-cover rounded-lg"
+              style="border-radius: 15px;"
+            >
+              <source src="{{ url_for('static', filename='intro.mp4') }}" type="video/mp4">
+              Your browser does not support the video tag.
+            </video>
+          </div>
+        </div>
+
+        <!-- Compact Form -->
+        <div class="form-section fade-in-up" style="animation-delay: 0.2s">
+          <h2 class="form-title">
+            <svg width="20" height="20" fill="currentColor" viewBox="0 0 20 20">
+              <path d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" />
+            </svg>
+            Thông tin bệnh nhân
+          </h2>
+
+          <form id="diagnosis-form" class="form-content">
+            <div class="form-grid">
+              <!-- Cột 1 -->
+              <div class="form-group flex flex-col">
+                <label class="form-label">Tuổi (năm) *</label>
+                <input
+                  type="number"
+                  class="form-input"
+                  name="age"
+                  min="1"
+                  max="120"
+                  required
+                  placeholder="Nhập tuổi"
+                />
+              </div>
+
+              <div class="form-group flex flex-col">
+                <label class="form-label">Giới tính *</label>
+                <select class="form-select" name="sex" required>
+                  <option value="">Chọn giới tính</option>
+                  <option value="1">Nam</option>
+                  <option value="0">Nữ</option>
+                </select>
+              </div>
+
+              <div class="form-group flex flex-col">
+                <label class="form-label">Loại đau ngực *</label>
+                <select class="form-select" name="cp" required>
+                  <option value="">Chọn loại</option>
+                  <option value="0">Đau ngực điển hình</option>
+                  <option value="1">Đau ngực không điển hình</option>
+                  <option value="2">Đau không liên quan</option>
+                  <option value="3">Không có triệu chứng</option>
+                </select>
+              </div>
+
+              <div class="form-group flex flex-col">
+                <label class="form-label">Huyết áp nghỉ (mmHg) *</label>
+                <input
+                  type="number"
+                  class="form-input"
+                  name="trestbps"
+                  min="0"
+                  max="250"
+                  required
+                  placeholder="VD: 120"
+                />
+              </div>
+
+              <div class="form-group flex flex-col">
+                <label class="form-label">Cholesterol (mg/dl) *</label>
+                <input
+                  type="number"
+                  class="form-input"
+                  name="chol"
+                  min="0"
+                  max="300"
+                  required
+                  placeholder="VD: 200"
+                />
+              </div>
+
+              <div class="form-group flex flex-col">
+                <label class="form-label">Đường huyết đói > 120 *</label>
+                <select class="form-select" name="fbs" required>
+                  <option value="">Chọn kết quả</option>
+                  <option value="1">Đúng (> 120)</option>
+                  <option value="0">Sai (≤ 120)</option>
+                </select>
+              </div>
+
+              <div class="form-group flex flex-col">
+                <label class="form-label">Kết quả ECG nghỉ *</label>
+                <select class="form-select" name="restecg" required>
+                  <option value="">Chọn kết quả</option>
+                  <option value="0">Bình thường</option>
+                  <option value="1">Bất thường ST-T</option>
+                  <option value="2">Phì đại tâm thất</option>
+                </select>
+              </div>
+
+              <div class="form-group flex flex-col">
+                <label class="form-label">Nhịp tim tối đa *</label>
+                <input
+                  type="number"
+                  class="form-input"
+                  name="thalach"
+                  min="0"
+                  max="200"
+                  required
+                  placeholder="VD: 150"
+                />
+              </div>
+
+              <div class="form-group flex flex-col">
+                <label class="form-label">Đau ngực khi tập *</label>
+                <select class="form-select" name="exang" required>
+                  <option value="">Chọn</option>
+                  <option value="1">Có</option>
+                  <option value="0">Không</option>
+                </select>
+              </div>
+
+              <div class="form-group flex flex-col">
+                <label class="form-label">Chênh lệch ST *</label>
+                <input
+                  type="number"
+                  class="form-input"
+                  name="oldpeak"
+                  min="0"
+                  max="1"
+                  step="0.01"
+                  required
+                  placeholder="VD: 0.5"
+                />
+              </div>
+
+              <div class="form-group flex flex-col">
+                <label class="form-label">Độ dốc ST *</label>
+                <select class="form-select" name="slope" required>
+                  <option value="">Chọn độ dốc</option>
+                  <option value="0">Dốc lên</option>
+                  <option value="1">Phẳng</option>
+                  <option value="2">Dốc xuống</option>
+                </select>
+              </div>
+
+              <div class="form-group flex flex-col">
+                <label class="form-label">Mạch máu tắc (0-3) *</label>
+                <select class="form-select" name="ca" required>
+                  <option value="">Chọn số</option>
+                  <option value="0">0</option>
+                  <option value="1">1</option>
+                  <option value="2">2</option>
+                  <option value="3">3</option>
+                </select>
+              </div>
+
+              <div class="form-group flex flex-col">
+                <label class="form-label">Thalassemia *</label>
+                <select class="form-select" name="thal" required>
+                  <option value="">Chọn loại</option>
+                  <option value="0">Không có</option>
+                  <option value="1">Khiếm khuyết cố định</option>
+                  <option value="2">Bình thường</option>
+                  <option value="3">Khiếm khuyết đảo ngược</option>
+                </select>
+              </div>
+            </div>
+
+            <button
+              type="submit"
+              class="analyze-btn form-full-width"
+              id="analyze-btn"
+            >
+              <div class="loading-spinner" id="loading-spinner"></div>
+              <span id="btn-text">🚀 PHÂN TÍCH VỚI AI</span>
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- Full Screen Results -->
+    <div class="result-section" id="result-section">
+      <div class="result-content-wrapper">
+        <div class="result-header">
+          <div class="result-header-left">
+            <div class="result-icon">
+              <svg width="25" height="25" fill="white" viewBox="0 0 24 24">
+                <path
+                  d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
+                />
+              </svg>
+            </div>
+            <div>
+              <h3 class="result-title">KẾT QUẢ PHÂN TÍCH</h3>
+              <p style="color: #a5b4fc; font-size: 0.9rem">
+                Dựa trên thuật toán AI
+              </p>
+            </div>
+          </div>
+          <button class="close-btn" onclick="closeResults()">✕ Đóng</button>
+        </div>
+
+        <div class="p-6 space-y-6">
+          <!-- Diagnosis Result -->
+          <div class="text-center mb-8">
+            <div class="mb-4">
+              <span id="result-emoji" class="text-6xl"></span>
+            </div>
+            <div id="result-level" class="inline-block px-6 py-3 rounded-full border-2 font-bold text-2xl"></div>
+          </div>
+
+          <!-- Patient Info - Top Row -->
+          <div class="bg-slate-700/50 rounded-xl p-6 border border-slate-600">
+            <h3 class="text-lg font-semibold mb-4 flex items-center gap-2">
+              <svg width="20" height="20" fill="currentColor" viewBox="0 0 20 20">
+                <path d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" />
+              </svg>
+              Thông tin bệnh nhân
+            </h3>
+            <div id="patient-info-display" class="grid grid-cols-2 gap-6 patient-info-display">
+              <!-- Patient info will be rendered here -->
+            </div>
+          </div>
+
+          <!-- Vital Signs - Bottom Row -->
+          <div class="bg-slate-700/50 rounded-xl p-6 border border-slate-600">
+            <h3 class="text-lg font-semibold mb-4 flex items-center gap-2">
+              <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24">
+                <path
+                  d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"
+                />
+              </svg>
+              Chỉ số sinh hiệu
+            </h3>
+            <div id="vital-signs-chart" class="space-y-3">
+              <!-- Vital signs will be rendered here -->
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      // Particle System
+      function createFloatingParticles() {
+        const particleSystem = document.getElementById("particle-system");
+        for (let i = 0; i < 8; i++) {
+          const particle = document.createElement("div");
+          particle.className = "particle";
+          particle.style.left = Math.random() * 100 + "%";
+          particle.style.animationDelay = Math.random() * 3 + "s";
+          particle.style.animationDuration = 3 + Math.random() * 2 + "s";
+          particleSystem.appendChild(particle);
+        }
+      }
+
+      // Heart Visualization removed
+
+      // Form handling
+      document
+        .getElementById("diagnosis-form")
+        .addEventListener("submit", function (e) {
+          e.preventDefault();
+
+          const formData = new FormData(this);
+          const data = {};
+
+          for (let [key, value] of formData.entries()) {
+            data[key] = value;
+          }
+
+          // Convert string values to numbers where appropriate
+          data.age = parseInt(data.age);
+          data.sex = parseInt(data.sex);
+          data.cp = parseInt(data.cp);
+          data.trestbps = parseInt(data.trestbps);
+          data.chol = parseInt(data.chol);
+          data.fbs = parseInt(data.fbs);
+          data.restecg = parseInt(data.restecg);
+          data.thalach = parseInt(data.thalach);
+          data.exang = parseInt(data.exang);
+          data.oldpeak = parseFloat(data.oldpeak);
+          data.slope = parseInt(data.slope);
+          data.ca = parseInt(data.ca);
+          data.thal = parseInt(data.thal);
+
+          // Show loading
+          const btn = document.getElementById("analyze-btn");
+          const spinner = document.getElementById("loading-spinner");
+          const btnText = document.getElementById("btn-text");
+
+          btn.disabled = true;
+          spinner.style.display = "inline-block";
+          btnText.textContent = "Đang phân tích...";
+
+          // Simulate AI analysis
+          setTimeout(() => {
+            const result = analyzeHeartDisease(data);
+            displayResults(result);
+            btn.disabled = false;
+            spinner.style.display = "none";
+            btnText.textContent = "🚀 PHÂN TÍCH VỚI AI";
+          }, 2000);
+        });
+
+      function analyzeHeartDisease(data) {
+        let riskScore = 0;
+
+        // Age factor
+        if (data.age > 65) {
+          riskScore += 25;
+        } else if (data.age > 55) {
+          riskScore += 15;
+        }
+
+        // Gender factor
+        if (data.sex === 1 && data.age > 45) {
+          riskScore += 10;
+        } else if (data.sex === 0 && data.age > 55) {
+          riskScore += 10;
+        }
+
+        // Chest pain type
+        if (data.cp === 0) {
+          riskScore += 20;
+        } else if (data.cp === 1) {
+          riskScore += 15;
+        }
+
+        // Blood pressure
+        if (data.trestbps > 140) {
+          riskScore += 15;
+        } else if (data.trestbps > 130) {
+          riskScore += 8;
+        }
+
+        // Cholesterol
+        if (data.chol > 240) {
+          riskScore += 15;
+        } else if (data.chol > 200) {
+          riskScore += 8;
+        }
+
+        // Other factors
+        if (data.fbs === 1) {
+          riskScore += 10;
+        }
+
+        if (data.restecg === 2) {
+          riskScore += 15;
+        } else if (data.restecg === 1) {
+          riskScore += 10;
+        }
+
+        const expectedMaxHR = 220 - data.age;
+        if (data.thalach < expectedMaxHR * 0.7) {
+          riskScore += 12;
+        }
+
+        if (data.exang === 1) {
+          riskScore += 15;
+        }
+
+        if (data.oldpeak > 2.0) {
+          riskScore += 15;
+        } else if (data.oldpeak > 1.0) {
+          riskScore += 8;
+        }
+
+        if (data.slope === 2) {
+          riskScore += 12;
+        } else if (data.slope === 1) {
+          riskScore += 6;
+        }
+
+        if (data.ca > 0) {
+          riskScore += data.ca * 8;
+        }
+
+        if (data.thal === 1) {
+          riskScore += 10;
+        } else if (data.thal === 3) {
+          riskScore += 15;
+        }
+
+        // Simple binary classification
+        const riskLevel = riskScore >= 50 ? "Mắc bệnh" : "Không mắc bệnh";
+        const riskClass = riskScore >= 50 ? "risk-high" : "risk-low";
+
+        // Helper functions for display values
+        const getDisplayValue = (field, value) => {
+          switch (field) {
+            case "cp":
+              const cpTypes = [
+                "Đau ngực điển hình",
+                "Đau ngực không điển hình",
+                "Đau không liên quan",
+                "Không có triệu chứng",
+              ];
+              return cpTypes[value] || "Không xác định";
+            case "fbs":
+              return value === 1 ? "Đúng (> 120)" : "Sai (≤ 120)";
+            case "restecg":
+              const ecgTypes = ["Bình thường", "Bất thường ST-T", "Phì đại tâm thất"];
+              return ecgTypes[value] || "Không xác định";
+            case "exang":
+              return value === 1 ? "Có" : "Không";
+            case "slope":
+              const slopeTypes = ["Dốc lên", "Phẳng", "Dốc xuống"];
+              return slopeTypes[value] || "Không xác định";
+            case "thal":
+              const thalTypes = ["Không có", "Khiếm khuyết cố định", "Bình thường", "Khiếm khuyết đảo ngược"];
+              return thalTypes[value] || "Không xác định";
+            default:
+              return value;
+          }
+        };
+
+        const vitalSigns = [
+          // All parameters as simple text display
+          { parameter: "Huyết áp nghỉ", value: data.trestbps, unit: "mmHg" },
+          { parameter: "Cholesterol", value: data.chol, unit: "mg/dl" },
+          { parameter: "Nhịp tim tối đa", value: data.thalach, unit: "bpm" },
+          { parameter: "Chênh lệch ST", value: data.oldpeak, unit: "" },
+          { parameter: "Mạch máu tắc", value: data.ca, unit: "mạch" },
+          { parameter: "Loại đau ngực", value: getDisplayValue("cp", data.cp), unit: "" },
+          { parameter: "Đường huyết đói > 120", value: getDisplayValue("fbs", data.fbs), unit: "" },
+          { parameter: "Kết quả ECG nghỉ", value: getDisplayValue("restecg", data.restecg), unit: "" },
+          { parameter: "Đau ngực khi tập", value: getDisplayValue("exang", data.exang), unit: "" },
+          { parameter: "Độ dốc ST", value: getDisplayValue("slope", data.slope), unit: "" },
+          { parameter: "Thalassemia", value: getDisplayValue("thal", data.thal), unit: "" },
+        ];
+
+        return {
+          riskLevel,
+          riskClass,
+          patientData: data,
+          vitalSigns: vitalSigns,
+        };
+      }
+
+      function displayResults(result) {
+        const resultSection = document.getElementById("result-section");
+        const resultEmoji = document.getElementById("result-emoji");
+        const resultLevel = document.getElementById("result-level");
+        const patientInfoDisplay = document.getElementById("patient-info-display");
+        const vitalSignsChart = document.getElementById("vital-signs-chart");
+
+        // Update diagnosis result
+        resultEmoji.textContent = result.riskLevel === "Mắc bệnh" ? "⚠️" : "✅";
+        resultLevel.textContent = result.riskLevel;
+        resultLevel.className = `inline-block px-6 py-3 rounded-full border-2 font-bold text-2xl ${result.riskClass}`;
+
+        // Render Patient Info
+        let patientInfoHtml = '';
+        const patientFieldsToShow = ["age", "sex"];
+        const getPatientFieldLabel = (field) => {
+          const labels = {
+            age: "Tuổi",
+            sex: "Giới tính",
+          };
+          return labels[field];
+        };
+        const getPatientDisplayValue = (field, value) => {
+          switch (field) {
+            case "sex":
+              return value === 1 ? "Nam" : "Nữ";
+            default:
+              return value.toString();
+          }
+        };
+
+        patientFieldsToShow.forEach(field => {
+          patientInfoHtml += `
+            <div class="flex justify-between items-center p-4 bg-cyan-500/10 border border-cyan-500/20 rounded-lg">
+              <span class="text-slate-300 text-lg font-medium">${getPatientFieldLabel(field)}</span>
+              <span class="text-cyan-400 font-bold text-xl">${getPatientDisplayValue(field, result.patientData[field])}</span>
+            </div>
+          `;
+        });
+        patientInfoDisplay.innerHTML = patientInfoHtml;
+
+        // Render Vital Signs
+        let vitalSignsHtml = '';
+        result.vitalSigns.forEach(item => {
+          const isNumeric = typeof item.value === "number";
+          const displayValue = isNumeric ? item.value : item.value;
+
+          vitalSignsHtml += `
+            <div class="space-y-2">
+              <div class="flex justify-between items-center p-3 bg-slate-600/30 rounded-lg">
+                <span class="text-sm font-medium text-slate-300">${item.parameter}</span>
+                <span class="text-sm text-cyan-400 font-semibold">
+                  ${displayValue} ${item.unit}
+                </span>
+              </div>
+            </div>
+          `;
+        });
+        vitalSignsChart.innerHTML = vitalSignsHtml;
+
+        resultSection.style.display = "flex"; // Use flex to center content
+      }
+
+      function closeResults() {
+        document.getElementById("result-section").style.display = "none";
+      }
+
+      // Initialize when page loads
+      window.addEventListener("load", () => {
+        createFloatingParticles();
+      });
+    </script>
+  </body>
+</html>

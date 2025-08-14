@@ -214,10 +214,11 @@
 
       /* Compact Main Content */
       .main-content {
-        display: grid;
-        grid-template-columns: 1fr 420px;
-        gap: 20px;
-        align-items: stretch;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        max-width: 800px;
+        margin: 0 auto;
       }
 
       .heart-section {
@@ -227,6 +228,10 @@
         border: 1px solid rgba(0, 212, 255, 0.3);
         padding: 20px;
         position: relative;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
       }
 
       .heart-container {
@@ -236,6 +241,38 @@
         border-radius: 15px;
         overflow: hidden;
         border: 1px solid rgba(0, 212, 255, 0.2);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .heart-image {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        border-radius: 15px;
+      }
+
+      .heart-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: linear-gradient(135deg, rgba(0, 212, 255, 0.1), rgba(255, 107, 157, 0.1));
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 15px;
+      }
+
+      .heart-text {
+        color: white;
+        font-size: 1.2rem;
+        font-weight: 600;
+        text-align: center;
+        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+        z-index: 2;
       }
 
       /* Compact Form */
@@ -247,6 +284,7 @@
         padding: 20px;
         display: flex;
         flex-direction: column;
+        order: 2;
       }
 
       .form-title {
@@ -455,8 +493,7 @@
         }
         
         .main-content {
-          grid-template-columns: 1fr 480px;
-          gap: 30px;
+          max-width: 900px;
         }
         
         .main-title {
@@ -486,8 +523,7 @@
         }
         
         .main-content {
-          grid-template-columns: 1fr 450px;
-          gap: 25px;
+          max-width: 850px;
         }
         
         .main-title {
@@ -513,8 +549,7 @@
         }
         
         .main-content {
-          grid-template-columns: 1fr 420px;
-          gap: 20px;
+          max-width: 800px;
         }
         
         .main-title {
@@ -540,11 +575,8 @@
         }
         
         .main-content {
-          grid-template-columns: 1fr;
-          gap: 20px;
+          max-width: 750px;
         }
-        
-
         
         .form-grid {
           grid-template-columns: 1fr 1fr;
@@ -570,11 +602,8 @@
         }
         
         .main-content {
-          grid-template-columns: 1fr;
-          gap: 15px;
+          max-width: 700px;
         }
-        
-
         
         .form-grid {
           grid-template-columns: 1fr 1fr;
@@ -604,8 +633,7 @@
         }
         
         .main-content {
-          grid-template-columns: 1fr;
-          gap: 15px;
+          max-width: 100%;
         }
         
         .form-grid {
@@ -727,6 +755,21 @@
         }
       }
 
+      /* Risk Level Styling */
+      .risk-high {
+        background: linear-gradient(135deg, #ef4444, #dc2626);
+        border-color: #ef4444 !important;
+        color: white;
+        box-shadow: 0 0 20px rgba(239, 68, 68, 0.3);
+      }
+
+      .risk-low {
+        background: linear-gradient(135deg, #10b981, #059669);
+        border-color: #10b981 !important;
+        color: white;
+        box-shadow: 0 0 20px rgba(16, 185, 129, 0.3);
+      }
+
       /* Simple Animations */
       .fade-in-up {
         animation: fadeInUp 0.6s ease-out forwards;
@@ -771,26 +814,8 @@
 
       <!-- Compact Main Content -->
       <div class="main-content">
-        <!-- Compact Heart Visualization -->
-        <div class="heart-section fade-in-up">
-          <div class="heart-container" id="heart-container">
-            <video 
-              autoplay 
-              muted 
-              loop 
-              playsinline
-              preload="auto"
-              class="w-full h-full object-cover rounded-lg"
-              style="border-radius: 15px;"
-            >
-              <source src="{{ url_for('static', filename='intro.mp4') }}" type="video/mp4">
-              Your browser does not support the video tag.
-            </video>
-          </div>
-        </div>
-
         <!-- Compact Form -->
-        <div class="form-section fade-in-up" style="animation-delay: 0.2s">
+        <div class="form-section fade-in-up">
           <h2 class="form-title">
             <svg width="20" height="20" fill="currentColor" viewBox="0 0 20 20">
               <path d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" />
@@ -886,7 +911,7 @@
                   class="form-input"
                   name="thalach"
                   min="0"
-                  max="200"
+                  max="300"
                   required
                   placeholder="VD: 150"
                 />
@@ -904,14 +929,14 @@
               <div class="form-group flex flex-col">
                 <label class="form-label">Chênh lệch ST *</label>
                 <input
-                  type="number"
+                  type="text"
                   class="form-input"
                   name="oldpeak"
-                  min="0"
-                  max="1"
-                  step="0.01"
                   required
-                  placeholder="VD: 0.5"
+                  placeholder="VD: 0.8"
+                  pattern="[0-9]*\.?[0-9]+"
+                  oninput="this.value = this.value.replace(/[^0-9.]/g, '');"
+                  onblur="validateOldpeak(this)"
                 />
               </div>
 
@@ -940,7 +965,6 @@
                 <label class="form-label">Thalassemia *</label>
                 <select class="form-select" name="thal" required>
                   <option value="">Chọn loại</option>
-                  <option value="0">Không có</option>
                   <option value="1">Khiếm khuyết cố định</option>
                   <option value="2">Bình thường</option>
                   <option value="3">Khiếm khuyết đảo ngược</option>
@@ -1037,8 +1061,6 @@
         }
       }
 
-      // Heart Visualization removed
-
       // Form handling
       document
         .getElementById("diagnosis-form")
@@ -1076,151 +1098,34 @@
           spinner.style.display = "inline-block";
           btnText.textContent = "Đang phân tích...";
 
-          // Simulate AI analysis
-          setTimeout(() => {
-            const result = analyzeHeartDisease(data);
-            displayResults(result);
+          // Call real AI API
+          fetch('/predict', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(data)
+          })
+          .then(response => response.json())
+          .then(result => {
+            if (result.error) {
+              alert('Lỗi: ' + result.error);
+            } else {
+              displayResults(result);
+            }
+          })
+          .catch(error => {
+            console.error('Error:', error);
+            alert('Có lỗi xảy ra trong quá trình phân tích. Vui lòng thử lại.');
+          })
+          .finally(() => {
             btn.disabled = false;
             spinner.style.display = "none";
             btnText.textContent = "🚀 PHÂN TÍCH VỚI AI";
-          }, 2000);
+          });
         });
 
-      function analyzeHeartDisease(data) {
-        let riskScore = 0;
 
-        // Age factor
-        if (data.age > 65) {
-          riskScore += 25;
-        } else if (data.age > 55) {
-          riskScore += 15;
-        }
-
-        // Gender factor
-        if (data.sex === 1 && data.age > 45) {
-          riskScore += 10;
-        } else if (data.sex === 0 && data.age > 55) {
-          riskScore += 10;
-        }
-
-        // Chest pain type
-        if (data.cp === 0) {
-          riskScore += 20;
-        } else if (data.cp === 1) {
-          riskScore += 15;
-        }
-
-        // Blood pressure
-        if (data.trestbps > 140) {
-          riskScore += 15;
-        } else if (data.trestbps > 130) {
-          riskScore += 8;
-        }
-
-        // Cholesterol
-        if (data.chol > 240) {
-          riskScore += 15;
-        } else if (data.chol > 200) {
-          riskScore += 8;
-        }
-
-        // Other factors
-        if (data.fbs === 1) {
-          riskScore += 10;
-        }
-
-        if (data.restecg === 2) {
-          riskScore += 15;
-        } else if (data.restecg === 1) {
-          riskScore += 10;
-        }
-
-        const expectedMaxHR = 220 - data.age;
-        if (data.thalach < expectedMaxHR * 0.7) {
-          riskScore += 12;
-        }
-
-        if (data.exang === 1) {
-          riskScore += 15;
-        }
-
-        if (data.oldpeak > 2.0) {
-          riskScore += 15;
-        } else if (data.oldpeak > 1.0) {
-          riskScore += 8;
-        }
-
-        if (data.slope === 2) {
-          riskScore += 12;
-        } else if (data.slope === 1) {
-          riskScore += 6;
-        }
-
-        if (data.ca > 0) {
-          riskScore += data.ca * 8;
-        }
-
-        if (data.thal === 1) {
-          riskScore += 10;
-        } else if (data.thal === 3) {
-          riskScore += 15;
-        }
-
-        // Simple binary classification
-        const riskLevel = riskScore >= 50 ? "Mắc bệnh" : "Không mắc bệnh";
-        const riskClass = riskScore >= 50 ? "risk-high" : "risk-low";
-
-        // Helper functions for display values
-        const getDisplayValue = (field, value) => {
-          switch (field) {
-            case "cp":
-              const cpTypes = [
-                "Đau ngực điển hình",
-                "Đau ngực không điển hình",
-                "Đau không liên quan",
-                "Không có triệu chứng",
-              ];
-              return cpTypes[value] || "Không xác định";
-            case "fbs":
-              return value === 1 ? "Đúng (> 120)" : "Sai (≤ 120)";
-            case "restecg":
-              const ecgTypes = ["Bình thường", "Bất thường ST-T", "Phì đại tâm thất"];
-              return ecgTypes[value] || "Không xác định";
-            case "exang":
-              return value === 1 ? "Có" : "Không";
-            case "slope":
-              const slopeTypes = ["Dốc lên", "Phẳng", "Dốc xuống"];
-              return slopeTypes[value] || "Không xác định";
-            case "thal":
-              const thalTypes = ["Không có", "Khiếm khuyết cố định", "Bình thường", "Khiếm khuyết đảo ngược"];
-              return thalTypes[value] || "Không xác định";
-            default:
-              return value;
-          }
-        };
-
-        const vitalSigns = [
-          // All parameters as simple text display
-          { parameter: "Huyết áp nghỉ", value: data.trestbps, unit: "mmHg" },
-          { parameter: "Cholesterol", value: data.chol, unit: "mg/dl" },
-          { parameter: "Nhịp tim tối đa", value: data.thalach, unit: "bpm" },
-          { parameter: "Chênh lệch ST", value: data.oldpeak, unit: "" },
-          { parameter: "Mạch máu tắc", value: data.ca, unit: "mạch" },
-          { parameter: "Loại đau ngực", value: getDisplayValue("cp", data.cp), unit: "" },
-          { parameter: "Đường huyết đói > 120", value: getDisplayValue("fbs", data.fbs), unit: "" },
-          { parameter: "Kết quả ECG nghỉ", value: getDisplayValue("restecg", data.restecg), unit: "" },
-          { parameter: "Đau ngực khi tập", value: getDisplayValue("exang", data.exang), unit: "" },
-          { parameter: "Độ dốc ST", value: getDisplayValue("slope", data.slope), unit: "" },
-          { parameter: "Thalassemia", value: getDisplayValue("thal", data.thal), unit: "" },
-        ];
-
-        return {
-          riskLevel,
-          riskClass,
-          patientData: data,
-          vitalSigns: vitalSigns,
-        };
-      }
 
       function displayResults(result) {
         const resultSection = document.getElementById("result-section");
@@ -1230,9 +1135,9 @@
         const vitalSignsChart = document.getElementById("vital-signs-chart");
 
         // Update diagnosis result
-        resultEmoji.textContent = result.riskLevel === "Mắc bệnh" ? "⚠️" : "✅";
-        resultLevel.textContent = result.riskLevel;
-        resultLevel.className = `inline-block px-6 py-3 rounded-full border-2 font-bold text-2xl ${result.riskClass}`;
+        resultEmoji.textContent = result.risk_level === "Mắc bệnh" ? "⚠️" : "✅";
+        resultLevel.textContent = result.risk_level;
+        resultLevel.className = `inline-block px-6 py-3 rounded-full border-2 font-bold text-2xl ${result.risk_class}`;
 
         // Render Patient Info
         let patientInfoHtml = '';
@@ -1257,7 +1162,7 @@
           patientInfoHtml += `
             <div class="flex justify-between items-center p-4 bg-cyan-500/10 border border-cyan-500/20 rounded-lg">
               <span class="text-slate-300 text-lg font-medium">${getPatientFieldLabel(field)}</span>
-              <span class="text-cyan-400 font-bold text-xl">${getPatientDisplayValue(field, result.patientData[field])}</span>
+              <span class="text-cyan-400 font-bold text-xl">${getPatientDisplayValue(field, result.patient_data[field])}</span>
             </div>
           `;
         });
@@ -1265,9 +1170,48 @@
 
         // Render Vital Signs
         let vitalSignsHtml = '';
-        result.vitalSigns.forEach(item => {
-          const isNumeric = typeof item.value === "number";
-          const displayValue = isNumeric ? item.value : item.value;
+        
+        // Helper function to get display value for different fields
+        const getDisplayValue = (field, value) => {
+          switch (field) {
+            case "cp":
+              const cpTypes = ["Đau ngực điển hình", "Đau ngực không điển hình", "Đau không liên quan", "Không có triệu chứng"];
+              return cpTypes[value] || "Không xác định";
+            case "fbs":
+              return value === 1 ? "Đúng (> 120)" : "Sai (≤ 120)";
+            case "restecg":
+              const ecgTypes = ["Bình thường", "Bất thường ST-T", "Phì đại tâm thất"];
+              return ecgTypes[value] || "Không xác định";
+            case "exang":
+              return value === 1 ? "Có" : "Không";
+            case "slope":
+              const slopeTypes = ["Dốc lên", "Phẳng", "Dốc xuống"];
+              return slopeTypes[value] || "Không xác định";
+            case "thal":
+              const thalTypes = ["Không có", "Khiếm khuyết cố định", "Bình thường", "Khiếm khuyết đảo ngược"];
+              return thalTypes[value] || "Không xác định";
+            default:
+              return value;
+          }
+        };
+
+        const vitalSignsData = [
+          { parameter: "Huyết áp nghỉ", field: "trestbps", unit: "mmHg" },
+          { parameter: "Cholesterol", field: "chol", unit: "mg/dl" },
+          { parameter: "Nhịp tim tối đa", field: "thalach", unit: "bpm" },
+          { parameter: "Chênh lệch ST", field: "oldpeak", unit: "" },
+          { parameter: "Mạch máu tắc", field: "ca", unit: "mạch" },
+          { parameter: "Loại đau ngực", field: "cp", unit: "" },
+          { parameter: "Đường huyết đói > 120", field: "fbs", unit: "" },
+          { parameter: "Kết quả ECG nghỉ", field: "restecg", unit: "" },
+          { parameter: "Đau ngực khi tập", field: "exang", unit: "" },
+          { parameter: "Độ dốc ST", field: "slope", unit: "" },
+          { parameter: "Thalassemia", field: "thal", unit: "" },
+        ];
+
+        vitalSignsData.forEach(item => {
+          const value = result.patient_data[item.field];
+          const displayValue = getDisplayValue(item.field, value);
 
           vitalSignsHtml += `
             <div class="space-y-2">
@@ -1287,6 +1231,18 @@
 
       function closeResults() {
         document.getElementById("result-section").style.display = "none";
+      }
+
+      // Validation function for oldpeak
+      function validateOldpeak(input) {
+        const value = parseFloat(input.value);
+        if (isNaN(value) || value < 0 || value > 10) {
+          input.setCustomValidity('Vui lòng nhập số từ 0 đến 10 (có thể là số thập phân)');
+          input.style.borderColor = '#ff6b6b';
+        } else {
+          input.setCustomValidity('');
+          input.style.borderColor = 'rgba(71, 85, 105, 0.5)';
+        }
       }
 
       // Initialize when page loads

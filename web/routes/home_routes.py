@@ -26,15 +26,6 @@ def load_model():
                 with open(scaler_path, 'rb') as f:
                     scaler = joblib.load(f)
                 print("scaler loaded successfully")
-                
-                # Check feature names in preprocessor
-                # if hasattr(preprocessor, 'feature_names_in_'):
-                #     print(f"Preprocessor feature names: {preprocessor.feature_names_in_}")
-                # elif hasattr(preprocessor, 'get_feature_names_out'):
-                #     print(f"Preprocessor feature names: {preprocessor.get_feature_names_out()}")
-                # else:
-                #     print("Preprocessor doesn't have feature names attribute")
-                    
             except Exception as e:
                 print(f"Failed to load preprocessor: {e}")
         else:
@@ -62,7 +53,6 @@ def predict():
         # Get form data
         data = request.get_json()
         
-        # Extract features in the correct order for SVM model
         features = {
             'age': int(data['age']),       
             'sex': int(data['sex']),        
